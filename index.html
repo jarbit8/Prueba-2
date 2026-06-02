@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personal Finance Management – DDD Tutorial</title>
+  <style>
+    :root {
+      --accent: #4f46e5;
+      --accent-light: #818cf8;
+      --bg: #0f0f1a;
+      --surface: #1a1a2e;
+      --surface2: #16213e;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --border: #2d2d5e;
+      --green: #22c55e;
+      --yellow: #eab308;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,15,26,0.85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 60px;
+    }
+    nav .logo { font-weight: 700; font-size: 1.1rem; color: var(--accent-light); }
+    nav ul { list-style: none; display: flex; gap: 1.5rem; }
+    nav ul a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: color .2s; }
+    nav ul a:hover { color: var(--text); }
+
+    /* HERO */
+    .hero {
+      min-height: 90vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      padding: 4rem 2rem;
+      background: radial-gradient(ellipse at 50% 0%, rgba(79,70,229,0.25) 0%, transparent 70%);
+    }
+    .badge {
+      display: inline-block; padding: .35rem .9rem;
+      background: rgba(79,70,229,.15); border: 1px solid rgba(79,70,229,.4);
+      border-radius: 999px; font-size: .8rem; color: var(--accent-light);
+      margin-bottom: 1.5rem; letter-spacing: .05em; text-transform: uppercase;
+    }
+    .hero h1 { font-size: clamp(2.2rem, 5vw, 4rem); font-weight: 800; line-height: 1.15; max-width: 800px; }
+    .hero h1 span { color: var(--accent-light); }
+    .hero p { max-width: 600px; margin: 1.5rem auto 2.5rem; color: var(--text-muted); font-size: 1.1rem; }
+    .btn-row { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .btn {
+      padding: .75rem 1.75rem; border-radius: 8px; font-weight: 600;
+      font-size: .95rem; text-decoration: none; transition: all .2s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #4338ca; }
+    .btn-outline { border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--accent-light); color: var(--accent-light); }
+
+    /* TECH STACK */
+    .tech-strip {
+      display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;
+      padding: 1.5rem 2rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    }
+    .chip {
+      display: flex; align-items: center; gap: .5rem;
+      padding: .4rem 1rem; border-radius: 999px;
+      background: var(--surface); border: 1px solid var(--border);
+      font-size: .85rem; color: var(--text-muted);
+    }
+    .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-java { background: #f97316; }
+    .dot-spring { background: var(--green); }
+    .dot-react { background: #38bdf8; }
+    .dot-ddd { background: var(--accent-light); }
+    .dot-h2 { background: var(--yellow); }
+
+    /* SECTIONS */
+    section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+    h2 { font-size: 1.9rem; font-weight: 700; margin-bottom: .5rem; }
+    h2 span { color: var(--accent-light); }
+    .section-sub { color: var(--text-muted); margin-bottom: 3rem; font-size: 1rem; }
+
+    /* GRID CARDS */
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.75rem; transition: border-color .2s;
+    }
+    .card:hover { border-color: var(--accent-light); }
+    .card-icon { font-size: 2rem; margin-bottom: 1rem; }
+    .card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: .5rem; }
+    .card p { font-size: .9rem; color: var(--text-muted); }
+
+    /* ARCHITECTURE */
+    .arch-layers { display: flex; flex-direction: column; gap: 1rem; max-width: 680px; margin: 0 auto; }
+    .layer {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.25rem 1.75rem;
+      display: flex; align-items: center; gap: 1.25rem;
+    }
+    .layer-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--accent); display: flex; align-items: center;
+      justify-content: center; font-weight: 700; font-size: .85rem; flex-shrink: 0;
+    }
+    .layer-content h4 { font-size: .95rem; font-weight: 600; }
+    .layer-content p { font-size: .85rem; color: var(--text-muted); }
+
+    /* PRINCIPLES */
+    .principles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .principle {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.25rem; text-align: center;
+    }
+    .principle .tag {
+      display: inline-block; padding: .2rem .7rem; border-radius: 999px;
+      font-size: .75rem; font-weight: 700; letter-spacing: .05em;
+      margin-bottom: .75rem;
+    }
+    .tag-grasp { background: rgba(79,70,229,.2); color: var(--accent-light); }
+    .tag-solid { background: rgba(34,197,94,.15); color: var(--green); }
+    .tag-gof  { background: rgba(234,179,8,.15);  color: var(--yellow); }
+    .principle h4 { font-size: .95rem; font-weight: 600; margin-bottom: .4rem; }
+    .principle p  { font-size: .82rem; color: var(--text-muted); }
+
+    /* USER STORIES */
+    .us-list { display: flex; flex-direction: column; gap: .75rem; max-width: 750px; }
+    .us-item {
+      display: flex; align-items: flex-start; gap: 1rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem 1.25rem;
+    }
+    .us-badge {
+      background: rgba(79,70,229,.15); color: var(--accent-light);
+      font-size: .75rem; font-weight: 700; padding: .2rem .6rem;
+      border-radius: 4px; white-space: nowrap; flex-shrink: 0; margin-top: .1rem;
+    }
+    .us-item p { font-size: .9rem; color: var(--text-muted); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border); text-align: center;
+      padding: 2.5rem; color: var(--text-muted); font-size: .85rem;
+    }
+    footer a { color: var(--accent-light); text-decoration: none; }
+
+    @media(max-width:600px){
+      nav ul { display: none; }
+      .hero h1 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">FinanceApp DDD</span>
+  <ul>
+    <li><a href="#about">About</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#principles">Principles</a></li>
+    <li><a href="#stories">User Stories</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="about">
+  <div class="badge">Domain-Driven Design Tutorial</div>
+  <h1>Personal <span>Finance</span><br/>Management App</h1>
+  <p>
+    A full-stack Web Application built with <strong>Java Spring Boot</strong> &amp; <strong>React</strong>,
+    demonstrating a complete Software Development Process with a DDD architecture,
+    SOLID/GRASP design patterns, and layered modularity.
+  </p>
+  <div class="btn-row">
+    <a class="btn btn-primary" href="#architecture">View Architecture</a>
+    <a class="btn btn-outline" href="https://github.com/jarbit8/prueba-2" target="_blank">GitHub Repo</a>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<div class="tech-strip">
+  <div class="chip"><span class="dot dot-java"></span>Java 11</div>
+  <div class="chip"><span class="dot dot-spring"></span>Spring Boot</div>
+  <div class="chip"><span class="dot dot-react"></span>React</div>
+  <div class="chip"><span class="dot dot-ddd"></span>DDD Architecture</div>
+  <div class="chip"><span class="dot dot-h2"></span>H2 Database</div>
+  <div class="chip"><span class="dot dot-spring"></span>REST API</div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <h2>Key <span>Features</span></h2>
+  <p class="section-sub">Everything a personal finance platform needs, built with enterprise-grade architecture.</p>
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-icon">👤</div>
+      <h3>Person Management</h3>
+      <p>Each person has a name, address, birthdate, birthplace, family relations (mother, father, siblings) and a personal ledger.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">👨‍👩‍👧‍👦</div>
+      <h3>Groups & Families</h3>
+      <p>People can form groups (e.g. families). Each group has administrators, a description, a creation date and a shared ledger.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">💰</div>
+      <h3>Financial Transactions</h3>
+      <p>Register credit/debit transactions in a Ledger with description, value, date and category. Supports scheduling with periodicity.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏦</div>
+      <h3>Accounts & Categories</h3>
+      <p>Create personal and group accounts. Organize transactions by custom categories per person or group.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h3>Transaction Search</h3>
+      <p>Search account records within a given period. Get a filtered view of group or personal transactions by date range.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔐</div>
+      <h3>Role-Based Access</h3>
+      <p>Group administrators can manage members, categories and accounts. Regular members have read/write access to shared ledgers.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <h2>DDD <span>Architecture</span></h2>
+  <p class="section-sub">Four conceptual layers — each with a single, well-defined responsibility.</p>
+  <div class="arch-layers">
+    <div class="layer">
+      <div class="layer-num">1</div>
+      <div class="layer-content">
+        <h4>User Interface (React)</h4>
+        <p>Presents information to the user and interprets commands. Communicates via REST with the Controller layer.</p>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="layer-num">2</div>
+      <div class="layer-content">
+        <h4>Controller Layer (Spring REST)</h4>
+        <p>REST controllers receive HTTP requests, create DTOs via Assemblers and delegate to Application Services.</p>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="layer-num">3</div>
+      <div class="layer-content">
+        <h4>Application Layer</h4>
+        <p>Thin services that orchestrate domain logic without containing business rules. One service per use case.</p>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="layer-num">4</div>
+      <div class="layer-content">
+        <h4>Domain Layer (DDD Core)</h4>
+        <p>Entities, Value Objects, Aggregates and domain services. This is the heart of the business model.</p>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="layer-num">5</div>
+      <div class="layer-content">
+        <h4>Infrastructure / Persistence (H2 + JPA)</h4>
+        <p>One repository per aggregate root. Data Models and Assemblers handle the mapping from domain to persistence.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRINCIPLES -->
+<section id="principles">
+  <h2>Design <span>Principles</span></h2>
+  <p class="section-sub">The project applies industry-standard patterns to achieve high cohesion and low coupling.</p>
+  <div class="principles-grid">
+    <div class="principle">
+      <span class="tag tag-grasp">GRASP</span>
+      <h4>High Cohesion</h4>
+      <p>Each class has a single, well-focused responsibility.</p>
+    </div>
+    <div class="principle">
+      <span class="tag tag-grasp">GRASP</span>
+      <h4>Low Coupling</h4>
+      <p>Modules depend on abstractions, not concrete implementations.</p>
+    </div>
+    <div class="principle">
+      <span class="tag tag-solid">SOLID</span>
+      <h4>Single Responsibility</h4>
+      <p>One reason to change per class — from controllers to repositories.</p>
+    </div>
+    <div class="principle">
+      <span class="tag tag-solid">SOLID</span>
+      <h4>Open / Closed</h4>
+      <p>Extend behavior via interfaces without modifying existing code.</p>
+    </div>
+    <div class="principle">
+      <span class="tag tag-solid">SOLID</span>
+      <h4>Dependency Inversion</h4>
+      <p>Services depend on repository interfaces, not on concrete JPA classes.</p>
+    </div>
+    <div class="principle">
+      <span class="tag tag-gof">GoF</span>
+      <h4>Factory / Assembler</h4>
+      <p>DTO Assemblers encapsulate object construction from primitive types.</p>
+    </div>
+    <div class="principle">
+      <span class="tag tag-gof">DDD</span>
+      <h4>Aggregate Root</h4>
+      <p>Person and Group are aggregate roots with their own repository each.</p>
+    </div>
+    <div class="principle">
+      <span class="tag tag-gof">DDD</span>
+      <h4>Value Objects</h4>
+      <p>Immutable types like PersonID, AccountID and CategoryID with no identity of their own.</p>
+    </div>
+  </div>
+</section>
+
+<!-- USER STORIES -->
+<section id="stories">
+  <h2>User <span>Stories</span></h2>
+  <p class="section-sub">A sample of the implemented functionalities (full list in UserStories.txt).</p>
+  <div class="us-list">
+    <div class="us-item">
+      <span class="us-badge">US002.1</span>
+      <p>As a user, I want to create a group, becoming a group administrator.</p>
+    </div>
+    <div class="us-item">
+      <span class="us-badge">US005.1</span>
+      <p>As a group administrator, I want to create a category and associate it with the group.</p>
+    </div>
+    <div class="us-item">
+      <span class="us-badge">US006.1</span>
+      <p>As a group administrator, I want to add a member to the group.</p>
+    </div>
+    <div class="us-item">
+      <span class="us-badge">US007.1</span>
+      <p>As a group member, I want to add a transaction to the group ledger.</p>
+    </div>
+    <div class="us-item">
+      <span class="us-badge">US008.1</span>
+      <p>As a user, I want to create a personal account with a denomination and description.</p>
+    </div>
+    <div class="us-item">
+      <span class="us-badge">US010</span>
+      <p>As a user/group member, I want to obtain the transactions of a certain account in a given period.</p>
+    </div>
+    <div class="us-item">
+      <span class="us-badge">US011</span>
+      <p>As a user, I want to check the balance of a specific account between two dates.</p>
+    </div>
+    <div class="us-item">
+      <span class="us-badge">US012</span>
+      <p>As a user, I want to check whether two persons are siblings.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Built with Java Spring Boot &amp; React · Domain-Driven Design Architecture</p>
+  <p style="margin-top:.5rem">
+    <a href="https://github.com/jarbit8/prueba-2" target="_blank">View source on GitHub</a>
+    &nbsp;·&nbsp;
+    Deployed via <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>
+  </p>
+</footer>
+
+</body>
+</html>
